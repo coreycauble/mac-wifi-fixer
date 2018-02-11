@@ -17,7 +17,8 @@ func main() {
 	urlList := []string{
 		"https://google.com",
 	}
-	var timeInt int = 5
+
+	var timeInt = 5
 
 	// consume command line args for configuration
 
@@ -34,7 +35,7 @@ func main() {
 		time.Sleep(time.Duration(timeInt) * time.Minute)
 		// saySomething("Please wait: I am checking your WiFi connections now.")
 		for _, url := range urlList {
-			if !checkHttpStatus(url) {
+			if !checkHTTPStatus(url) {
 				//s := fmt.Sprintf("Oh NO! Connection to %v failed!", url)
 				//saySomething(s)
 				log.Println("Restarting Wifi Connection")
@@ -70,7 +71,7 @@ func saySomething(speach string) {
 	}
 }
 
-func checkHttpStatus(url string) bool {
+func checkHTTPStatus(url string) bool {
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
@@ -82,11 +83,10 @@ func checkHttpStatus(url string) bool {
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
 		log.Println("HTTP Status OK!")
 
-		return true
 	} else {
 		log.Println("Argh! Broken")
-		return true
 	}
+	return true
 }
 
 func getWifiInterface() string {
