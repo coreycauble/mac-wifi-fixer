@@ -14,11 +14,14 @@ import (
 
 func main() {
 
+	net := getWifiInterface()
+
 	urlList := []string{
 		"https://google.com",
 	}
 
 	var timeInt = 5
+	var restartCount int
 
 	// consume command line args for configuration
 
@@ -30,7 +33,7 @@ func main() {
 		urlList = flag.Args()
 	}
 
-	log.Printf("Wifi connection being monitored.....\n\t\twith parameters. Interval: %v URLS: %v", timeInt, urlList)
+	log.Printf("Wifi connection being monitored.....\n\t\twith parameters. Interval: %v minutes URLS: %v", timeInt, urlList)
 	for {
 		time.Sleep(time.Duration(timeInt) * time.Minute)
 		// saySomething("Please wait: I am checking your WiFi connections now.")
@@ -39,23 +42,25 @@ func main() {
 				//s := fmt.Sprintf("Oh NO! Connection to %v failed!", url)
 				//saySomething(s)
 				log.Println("Restarting Wifi Connection")
-				wifiControl("off")
+				wifiControl("off", net)
 				duration := time.Second * 5
 				time.Sleep(duration)
-				wifiControl("on")
+				wifiControl("on", net)
 				saySomething("Your Wifi has been restarted.")
+				restartCount++
 				break
 			} else {
 				//s := fmt.Sprintf("Connection to %v successful", url)
 				//saySomething(s)
 			}
 		}
+		log.Printf("Wifi Connection reset [%v] times", restartCount)
 	}
 }
 
-func wifiControl(state string) {
+func wifiControl(state string, net string) {
 	cmdName := "networksetup"
-	cmdArgs := []string{"-setairportpower", getWifiInterface(), state}
+	cmdArgs := []string{"-setairportpower", net, state}
 	if _, err := exec.Command(cmdName, cmdArgs...).Output(); err != nil {
 		fmt.Fprintln(os.Stderr, "There was an error running : ", err)
 		os.Exit(1)
